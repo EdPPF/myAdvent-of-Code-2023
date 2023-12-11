@@ -7,10 +7,9 @@ This is my first time participating in any sort of "competitive programming" (th
 The structure of this repository is as follows:
 
 ```
-/2023
-    - /DayN
-        - /Python
-        - /Rust
+- /DayN
+    - /Python
+    - /Rust
 ```
 
 Where `DayN` exemplifies all subdirectories, one for each day.
