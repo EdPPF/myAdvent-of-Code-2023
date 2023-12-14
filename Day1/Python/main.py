@@ -1,7 +1,10 @@
 def main():
     # print(check_sum(file="values.txt"))
     # print(check_sum(file="test.txt"))
-    print(check_sum2('values.txt'))
+
+    # print(check_sum2('values.txt'))
+
+    print(third_impact('values.txt'))
 
 # First attempt: Valid
 # Surely, there are better ways to do this (or, at least, ways to do it with less code).
@@ -87,6 +90,38 @@ def check_sum2(file='') -> int:
         first = line.strip(n)[0]
         last = line.strip(n)[-1]
         values.append(int(first+last))
+
+    file.close()
+
+    return sum(values)
+
+# Third attempt: Valid
+# Oh well. This one is way simpler than the other two.
+# It uses list comprehension, which is something i should've used in the first place.
+def third_impact(file='') -> int:
+    '''
+    Third approach to the solution:
+        This function uses the `isdigit` function with list comprehension to check if a
+        character is a digit. If so, it is added to a list. After all the input is used,
+        the return is the sum of all numbers.
+
+    ### Parameters
+    `file`: `str`
+        The file name or location of the input of the problem.
+
+    ### Returns
+    `int`
+        An integer representing the sum of all the desired values from the input.
+    '''
+    try:
+        file = open(file=file, mode='r')
+    except:
+        raise OSError("Error openning file.")
+
+    values = []
+    for line in file:
+        digits = [char for char in line if char.isdigit()]
+        values.append(int(digits[0]+digits[-1]))
 
     file.close()
 
