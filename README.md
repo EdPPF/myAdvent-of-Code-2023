@@ -16,4 +16,4 @@ Where `DayN` exemplifies all subdirectories, one for each day.
 
 As the structure suggests, my attempts will be in **Python**, with which i'm fairly used to but need more improvement, and **Rust**, the language i started learning not too long ago.
 
-## Happy Holidays!
+## :christmas_tree: Happy Holidays! :christmas_tree:
