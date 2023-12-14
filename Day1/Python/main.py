@@ -1,6 +1,7 @@
 def main():
-    print(check_sum(file="values.txt"))
+    # print(check_sum(file="values.txt"))
     # print(check_sum(file="test.txt"))
+    print(check_sum2('values.txt'))
 
 # First attempt: Valid
 # Surely, there are better ways to do this (or, at least, ways to do it with less code).
@@ -56,6 +57,40 @@ def check_sum(file=""):
     file.close()
     return sum(lines_sum)
 
+# Second attempt: Valid
+# While this works and is more concise, it is more restrained than the first solution.
+# One drawback i can see is that it only works if the string contains what is specified in `n`.
+# Because of that, i still prefer the first attempt.
+def check_sum2(file='') -> int:
+    '''
+    Second approach to the solution:
+        Using the same idea of `check_sum`, this function uses the `strip` function to
+        remove non digits from each line of the input while composing the two digit number.
+
+    ### Parameters
+    `file`: `str`
+        The file name or location of the input of the problem.
+
+    ### Returns
+    `int`
+        An integer representing the sum of all the desired values from the input.
+    '''
+
+    try:
+        file = open(file=file, mode='r')
+    except:
+        raise OSError("Error openning file.")
+
+    values = []
+    for line in file.readlines():
+        n = "abcdefghijklmnopqrstuvwxyz\n"
+        first = line.strip(n)[0]
+        last = line.strip(n)[-1]
+        values.append(int(first+last))
+
+    file.close()
+
+    return sum(values)
 
 
 if __name__ == '__main__':
