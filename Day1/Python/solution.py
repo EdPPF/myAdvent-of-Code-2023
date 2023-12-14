@@ -1,15 +1,8 @@
 def main():
-    # print(check_sum(file="values.txt"))
-    # print(check_sum(file="test.txt"))
-
-    # print(check_sum2('values.txt'))
-
+    print(check_sum(file="values.txt"))
+    print(check_sum2('values.txt'))
     print(third_impact('values.txt'))
 
-    import timeit
-    timeit.timeit(check_sum(file='../values.txt'), number=10000)
-    timeit.timeit(check_sum2(file='../values.txt'), number=10000)
-    timeit.timeit(third_impact(file='../values.txt'), number=10000)
 
 # First attempt: Valid
 # Surely, there are better ways to do this (or, at least, ways to do it with less code).
