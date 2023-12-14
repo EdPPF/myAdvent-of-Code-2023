@@ -23,34 +23,37 @@ def check_sum(file=""):
         An integer representing the sum of all the desired values from the input.
     '''
 
-    if (file == ""):
-        return "File unreachable, please check if the file exists or is in the correct location."
+    try:
+        file = open(file=file, mode='r')
+    except:
+        raise OSError("Error openning file.")
 
     lines_sum = []
-    file = open(file=file, mode="r")
-    for line in file:
-        line_value = ""
-        begin = 0
-        end = -2 # We start at -2 because line ends with \n
+    with file:
+        for line in file:
+            line_value = ""
+            begin = 0
+            end = -2 # We start at -2 because line ends with \n
 
-        for i in range(len(line)):
-            first = line[begin]
-            if first.isnumeric():
-                line_value += first
-                break
-            else:
-                begin += 1
+            for _ in range(len(line)):
+                first = line[begin]
+                if first.isnumeric():
+                    line_value += first
+                    break
+                else:
+                    begin += 1
 
-        for j in range(len(line)-1):
-            last = line[end]
-            if last.isnumeric():
-                line_value += last
-                break
-            else:
-                end -= 1
+            for _ in range(len(line)-1):
+                last = line[end]
+                if last.isnumeric():
+                    line_value += last
+                    break
+                else:
+                    end -= 1
 
-        lines_sum.append(int(line_value))
+            lines_sum.append(int(line_value))
 
+    file.close()
     return sum(lines_sum)
 
 
