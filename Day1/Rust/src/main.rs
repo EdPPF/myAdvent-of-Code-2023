@@ -21,9 +21,8 @@ fn get_sum(file: &str) -> u32 {
         let first_num: u32= line.chars().nth(first_num_index).unwrap().to_digit(10).unwrap();
         // println!("[{}] = {}", first_num_index, first_num);
 
-        // This, alongside the unwrap() method, will return the index of the last numeric char
+        // Same as above, but for the last numeric char
         let last_num_index: usize = line.rfind(char::is_numeric).unwrap();
-        // This gets the char at the index, already as integer
         let last_num: u32 = line.chars().nth(last_num_index).unwrap().to_digit(10).unwrap();
         // println!("[{}] = {}", last_num_index, last_num);
 
