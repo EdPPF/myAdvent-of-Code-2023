@@ -34,6 +34,20 @@ fn get_sum(file: &str) -> u32 {
 }
 
 
+// Not really necessary, but still
+#[cfg(test)]
+mod unit_tests {
+    #[test]
+    fn get_sum_from_test() {
+        assert_eq!(super::get_sum("src/test.txt"), 142);
+    }
+
+    #[test]
+    fn get_sum_from_values() {
+        assert_eq!(super::get_sum("src/values.txt"), 55123);
+    }
+}
+
 // Solution Idea:
 // While parsing through the file, on each line, start from the beginning
 // and the end of the string until finding a number. Take those numbers
