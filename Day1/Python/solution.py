@@ -228,6 +228,7 @@ def check_real_sum2(file=''):
         print("")
 
 # Second attempt: Valid
+# Slighly faster than the first attempt, but still not very good.
 # I feel like i'm missing simething. There should be a better way to do this.
 def second_alg(file=''):
     ''' Based on the idea:
