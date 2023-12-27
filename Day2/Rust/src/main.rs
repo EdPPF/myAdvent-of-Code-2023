@@ -57,15 +57,16 @@ fn get_valid_games_sum(file: &str) -> u32 {
             let pulls: Vec<&str> = set.split(", ").collect(); // -> ["5 green", "6 blue", "1 red"]
 
             for cubes in pulls {
-                // Gets quantity AND the cube type on this pull:
+                // Gets quantity on this pull:
                 let cube_quantity: u32 = {
                     if cubes[1..2].parse::<char>().unwrap() == ' ' {
                         cubes[0..1].parse().unwrap() // -> 5
                     }
                     else {
-                        cubes[0..2].parse().unwrap() // -> 50
+                        cubes[0..2].parse().unwrap()
                     }
                 };
+                // Gets cube type (color) on this pull:
                 let cube_type: &str = {
                     if cubes[1..2].parse::<char>().unwrap() == ' ' {
                         &cubes[2..] // -> "green"
@@ -90,7 +91,7 @@ fn get_valid_games_sum(file: &str) -> u32 {
                         game_possible = false;
                         continue 'current_game;
                     },
-                    &_ => println!("UwUpsie") // This should never happen
+                    &_ => println!("Invalid Color.") // This should never happen
                 }
             }
         }
