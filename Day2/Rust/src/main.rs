@@ -1,10 +1,13 @@
 fn main() {
     println!("Test: {}", get_valid_games_sum("src/test.txt"));
     println!("Values: {}", get_valid_games_sum("src/values.txt"));
+
+    println!("Test 2: {}", get_games_power_sum("src/test.txt"));
+    println!("Values 2: {}", get_games_power_sum("src/values.txt"));
 }
 
 
-use std::fs;
+use std::{fs, collections::HashMap};
 fn file_parser(file: &str) -> String {
     let data: String = fs::read_to_string(file).expect("Unable to read file.");
     data
@@ -103,6 +106,76 @@ fn get_valid_games_sum(file: &str) -> u32 {
     possible_games.iter().sum()
 }
 
+/////////////////////////////Part 2//////////////////////////////
+
+// First attempt - Python translation: Valid
+fn get_games_power_sum(file: &str) -> u32 {
+    let data: String = file_parser(file);
+
+    let mut power_list: Vec<u32> = vec![];
+    for game in data.lines() {
+        let mut game_dict: HashMap<&str, u32> = HashMap::from([
+            ("red",   0),
+            ("green", 0),
+            ("blue",  0)
+        ]);
+
+        let mut game_power: u32 = 1;
+
+        // Gets sets of cubes for this game:
+        let game_sets: Vec<&str> = { // -> ['5 green, 6 blue, 1 red']
+            if game[7..8].parse::<char>().unwrap() == ' ' {
+                game[8..].split("; ").collect()
+            }
+            // This accounts for the 100th line, where the ' ' is in the 9th position
+            else if game[9..10].parse::<char>().unwrap() == ' ' {
+                game[10..].split("; ").collect()
+            }
+            else {
+                game[9..].split("; ").collect()
+            }
+        };
+
+        for set in game_sets {
+            // Gets cubes pulls for each set:
+            let pulls: Vec<&str> = set.split(", ").collect(); // -> ["5 green", "6 blue", "1 red"]
+
+            for cubes in pulls {
+                // Gets quantity on this pull:
+                let cube_quantity: u32 = {
+                    if cubes[1..2].parse::<char>().unwrap() == ' ' {
+                        cubes[0..1].parse().unwrap() // -> 5
+                    }
+                    else {
+                        cubes[0..2].parse().unwrap()
+                    }
+                };
+                // Gets cube type (color) on this pull:
+                let cube_type: &str = {
+                    if cubes[1..2].parse::<char>().unwrap() == ' ' {
+                        &cubes[2..] // -> "green"
+                    }
+                    else {
+                        &cubes[3..]
+                    }
+                };
+
+                // Update game_dict with highest value of each color:
+                if cube_quantity > game_dict[cube_type] {
+                    // game_dict[cube_type] = cube_quantity;
+                    game_dict.insert(cube_type, cube_quantity);
+                }
+            }
+        }
+        for (_, value) in game_dict.iter() {
+            game_power *= value;
+        }
+        power_list.push(game_power);
+    }
+
+    power_list.iter().sum()
+}
+
 
 #[cfg(test)]
 mod unit_tests {
@@ -114,5 +187,15 @@ mod unit_tests {
     #[test]
     fn get_valid_games_sum_from_values() {
         assert_eq!(super::get_valid_games_sum("src/values.txt"), 2149);
+    }
+
+    #[test]
+    fn get_games_power_sum_from_test() {
+        assert_eq!(super::get_games_power_sum("src/test.txt"), 2286);
+    }
+
+    #[test]
+    fn get_games_power_sum_from_values() {
+    assert_eq!(super::get_games_power_sum("src/values.txt"), 71274);
     }
 }
