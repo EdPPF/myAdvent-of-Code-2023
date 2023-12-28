@@ -5,8 +5,10 @@
 
 
 def main():
-    print(get_valid_games_sum('test.txt'))
-    print(get_valid_games_sum('values.txt'))
+    # print(get_valid_games_sum('test.txt'))
+    # print(get_valid_games_sum('values.txt'))
+    print(get_games_power_sum('test.txt'))
+    print(get_games_power_sum('values.txt'))
 
 
 # Auxiliar function for opening files.
@@ -38,7 +40,7 @@ def get_valid_games_sum(file=''):
         game_sets = line[8:-1].split('; ') if line[7] == ' ' else line[9:-1].split('; ') # -> ['5 green, 6 blue, 1 red']
 
         for set in game_sets:
-            # Gets cubes pulles for each set:
+            # Gets cubes pulls for each set:
             pulls = set.split(', ') # -> ['5 green', '60 blue', '1 red']
 
             for cubes in pulls:
@@ -75,6 +77,49 @@ def get_valid_games_sum(file=''):
 
     return sum(possible_games)
 
+#############################Part 2##############################
+# The problem now is: On each game, what is the minimun amount of each cube that makes THE GAME possible?
+# To solve this problem, i could evaluate the whole game (all sets of cubes) and get THE MAXIMUM values
+# of each type of cube.
+# The answer to the problem is the sum of each game's Power, which is the product of each value.
+
+# For this, since i'm planning on reusing the same idea of the first part, i might refactor some code into
+# their own function. Eventually
+
+# First attempt: Valid
+def get_games_power_sum(file:str) -> int:
+    file = open_file(file)
+
+    power_list: list[int] = []
+    for game in file:
+        game_dict: dict = {'red': 0, 'blue': 0, 'green': 0}
+        game_power: int = 1
+
+        # Gets sets of cubes for this game:
+        game_sets = game[8:-1].split('; ') if game[7] == ' ' else game[9:-1].split('; ') # -> ['5 green, 6 blue, 1 red']
+
+        for set in game_sets:
+            # Gets cubes pulls for each set:
+            pulls = set.split(', ') # -> ['5 green', '60 blue', '1 red']
+
+            for cubes in pulls:
+                # Gets quantity AND the cube type on this pull:
+                if cubes[1] == ' ':
+                    cube_quantity = int(cubes[0]) # -> '5'
+                    cube_type = cubes[2:] # -> 'green'
+                else:
+                    cube_quantity = int(cubes[0:2])
+                    cube_type = cubes[3:]
+
+                # update game_dict with highest value of each color:
+                if cube_quantity > game_dict[cube_type]:
+                    game_dict[cube_type] = cube_quantity
+
+        for (_, value) in game_dict.items():
+            game_power *= value
+        power_list.append(game_power)
+
+    return sum(power_list)
 
 
 if __name__ == '__main__':
