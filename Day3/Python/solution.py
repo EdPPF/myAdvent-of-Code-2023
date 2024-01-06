@@ -26,6 +26,11 @@ def get_num(initial_index: int, line: str):
     return int(the_number)
 
 
+'''
+issue#1
+TODO: refactor codes mentioned on issue
+'''
+
 def get_sum(arch: str):
     symbols = "*@#$+-=%/&"
 
