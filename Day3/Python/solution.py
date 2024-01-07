@@ -26,11 +26,6 @@ def get_num(initial_index: int, line: str):
     return int(the_number)
 
 
-'''
-issue#1
-TODO: refactor codes mentioned on issue
-'''
-
 def get_sum(arch: str):
     symbols = "*@#$+-=%/&"
 
@@ -55,14 +50,8 @@ def get_sum(arch: str):
                     if num.isnumeric():
                         ## Left - same line; line below:
                         if prev_line_index-1 >= 0: # If ther's a char on the left
-                            ## Same line:
-                            if previous_line[prev_line_index-1] in symbols: # If char is symbol
-                                this_num = get_num(prev_line_index, previous_line)
-                                if this_num != temp_num:
-                                    sum_list.append(this_num)
-                                    temp_num = this_num
-                            ## Line below, left diagonal:
-                            if current_line[prev_line_index-1] in symbols:
+                            ## Same line || Line below, left diagonal:
+                            if previous_line[prev_line_index-1] in symbols or current_line[prev_line_index-1] in symbols:
                                 this_num = get_num(prev_line_index, previous_line)
                                 if this_num != temp_num:
                                     sum_list.append(this_num)
@@ -77,14 +66,8 @@ def get_sum(arch: str):
 
                         ## Rigth - same line; line below:
                         if prev_line_index+1 < len(previous_line):
-                            ## Same line:
-                            if previous_line[prev_line_index+1] in symbols:
-                                this_num = get_num(prev_line_index, previous_line)
-                                if this_num != temp_num:
-                                    sum_list.append(this_num)
-                                    temp_num = this_num
-                            ## Line below, right diagonal:
-                            if current_line[prev_line_index+1] in symbols:
+                            ## Same line || Line below, right diagonal:
+                            if previous_line[prev_line_index+1] in symbols or current_line[prev_line_index+1] in symbols:
                                 this_num = get_num(prev_line_index, previous_line)
                                 if this_num != temp_num:
                                     sum_list.append(this_num)
@@ -97,14 +80,8 @@ def get_sum(arch: str):
                     if num.isnumeric():
                         ## Left - same line; line below:
                         if next_line_index-1 >= 0:
-                            ## Same line
-                            if next_line[next_line_index-1] in symbols:
-                                this_num = get_num(next_line_index, next_line)
-                                if this_num != temp_num:
-                                    sum_list.append(this_num)
-                                    temp_num = this_num
-                            ## Line above, left diagonal:
-                            if current_line[next_line_index-1] in symbols:
+                            ## Same line || Line above, left diagonal:
+                            if next_line[next_line_index-1] in symbols or current_line[next_line_index-1] in symbols:
                                 this_num = get_num(next_line_index, next_line)
                                 if this_num != temp_num:
                                     sum_list.append(this_num)
@@ -119,14 +96,8 @@ def get_sum(arch: str):
 
                         ## Rigth - same line; line above:
                         if next_line_index+1 < len(previous_line):
-                            ## Same line:
-                            if next_line[next_line_index+1] in symbols:
-                                this_num = get_num(next_line_index, next_line)
-                                if this_num != temp_num:
-                                    sum_list.append(this_num)
-                                    temp_num = this_num
-                            ## Line above, right diagonal:
-                            if current_line[next_line_index+1] in symbols:
+                            ## Same line || Line above, right diagonal:
+                            if next_line[next_line_index+1] in symbols or current_line[next_line_index+1] in symbols:
                                 this_num = get_num(next_line_index, next_line)
                                 if this_num != temp_num:
                                     sum_list.append(this_num)
@@ -137,33 +108,19 @@ def get_sum(arch: str):
                 if num.isnumeric():
                     ## Left - line above; same line; line below:
                     if cur_line_index-1 >= 0:
-                        ## Line above, left diagonal:
-                        if previous_line[cur_line_index-1] in symbols:
-                            this_num = get_num(cur_line_index, current_line)
-                            if this_num != temp_num:
-                                sum_list.append(this_num)
-                                temp_num = this_num
-                        ## Same line:
-                        if current_line[cur_line_index-1] in symbols:
-                            this_num = get_num(cur_line_index, current_line)
-                            if this_num != temp_num:
-                                sum_list.append(this_num)
-                                temp_num = this_num
-                        ## Line below, left diagonal:
-                        if next_line[cur_line_index-1] in symbols:
+                        ## Line above, left diagonal || Same line || Line below, left diagonal:
+                        if (
+                            previous_line[cur_line_index-1] in symbols or
+                            current_line[cur_line_index-1] in symbols or
+                            next_line[cur_line_index-1] in symbols
+                            ):
                             this_num = get_num(cur_line_index, current_line)
                             if this_num != temp_num:
                                 sum_list.append(this_num)
                                 temp_num = this_num
 
-                    ## Same index - line above:
-                    if previous_line[cur_line_index] in symbols:
-                        this_num = get_num(cur_line_index, current_line)
-                        if this_num != temp_num:
-                            sum_list.append(this_num)
-                            temp_num = this_num
-                    ## Same index - line below:
-                    if next_line[cur_line_index] in symbols:
+                    ## Same index - line above || line below:
+                    if previous_line[cur_line_index] in symbols or next_line[cur_line_index] in symbols:
                         this_num = get_num(cur_line_index, current_line)
                         if this_num != temp_num:
                             sum_list.append(this_num)
@@ -171,20 +128,12 @@ def get_sum(arch: str):
 
                     ## Rigth - line above; same line; line below:
                     if cur_line_index+1 < len(current_line):
-                        ## Line above, rigth diagonal:
-                        if previous_line[cur_line_index+1] in symbols:
-                            this_num = get_num(cur_line_index, current_line)
-                            if this_num != temp_num:
-                                sum_list.append(this_num)
-                                temp_num = this_num
-                        ## Same line:
-                        if current_line[cur_line_index+1] in symbols:
-                            this_num = get_num(cur_line_index, current_line)
-                            if this_num != temp_num:
-                                sum_list.append(this_num)
-                                temp_num = this_num
-                        ## Line below, right diagonal:
-                        if next_line[cur_line_index+1] in symbols:
+                        ## Line above, rigth diagonal || Same line || Line below, right diagonal:
+                        if (
+                            previous_line[cur_line_index+1] in symbols or
+                            current_line[cur_line_index+1] in symbols or
+                            next_line[cur_line_index+1] in symbols
+                            ):
                             this_num = get_num(cur_line_index, current_line)
                             if this_num != temp_num:
                                 sum_list.append(this_num)
