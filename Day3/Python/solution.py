@@ -26,6 +26,18 @@ def get_num(initial_index: int, line: str):
     return int(the_number)
 
 
+def retrieve_num(line_index, target_line, target_list, temp_num):
+    '''
+    Gets number at `line_index` from `target_line` and appends to `target_list` only after
+    performing a check - if the number retrieved from line is different from the immediate previous number.
+    '''
+    this_num = get_num(line_index, target_line)
+    if this_num != temp_num:
+        target_list.append(this_num)
+        temp_num = this_num
+    return temp_num
+
+
 def get_sum(arch: str):
     symbols = "*@#$+-=%/&"
 
@@ -52,56 +64,38 @@ def get_sum(arch: str):
                         if prev_line_index-1 >= 0: # If ther's a char on the left
                             ## Same line || Line below, left diagonal:
                             if previous_line[prev_line_index-1] in symbols or current_line[prev_line_index-1] in symbols:
-                                this_num = get_num(prev_line_index, previous_line)
-                                if this_num != temp_num:
-                                    sum_list.append(this_num)
-                                    temp_num = this_num
+                                temp_num = retrieve_num(prev_line_index, previous_line, sum_list, temp_num)
 
                         ## Same index - line below:
                         if current_line[prev_line_index] in symbols:
-                            this_num = get_num(prev_line_index, previous_line)
-                            if this_num != temp_num:
-                                sum_list.append(this_num)
-                                temp_num = this_num
+                            temp_num = retrieve_num(prev_line_index, previous_line, sum_list, temp_num)
 
                         ## Rigth - same line; line below:
                         if prev_line_index+1 < len(previous_line):
                             ## Same line || Line below, right diagonal:
                             if previous_line[prev_line_index+1] in symbols or current_line[prev_line_index+1] in symbols:
-                                this_num = get_num(prev_line_index, previous_line)
-                                if this_num != temp_num:
-                                    sum_list.append(this_num)
-                                    temp_num = this_num
+                                temp_num = retrieve_num(prev_line_index, previous_line, sum_list, temp_num)
 
             ## If next line is the last line of the input:
             if index+2 == len(lines): # Using 'index+2' because we reach maximum index of 138
                 ## Check if numbers on next_line are adj to symbols on current_line:
                 for next_line_index, num in enumerate(next_line):
                     if num.isnumeric():
-                        ## Left - same line; line below:
+                        ## Left - same line || line below:
                         if next_line_index-1 >= 0:
                             ## Same line || Line above, left diagonal:
                             if next_line[next_line_index-1] in symbols or current_line[next_line_index-1] in symbols:
-                                this_num = get_num(next_line_index, next_line)
-                                if this_num != temp_num:
-                                    sum_list.append(this_num)
-                                    temp_num = this_num
+                                temp_num = retrieve_num(next_line_index, next_line, sum_list, temp_num)
 
                         ## Same index - line above:
                         if current_line[next_line_index] in symbols:
-                            this_num = get_num(next_line_index, next_line)
-                            if this_num != temp_num:
-                                sum_list.append(this_num)
-                                temp_num = this_num
+                            temp_num = retrieve_num(next_line_index, next_line, sum_list, temp_num)
 
-                        ## Rigth - same line; line above:
+                        ## Rigth - same line || line above:
                         if next_line_index+1 < len(previous_line):
                             ## Same line || Line above, right diagonal:
                             if next_line[next_line_index+1] in symbols or current_line[next_line_index+1] in symbols:
-                                this_num = get_num(next_line_index, next_line)
-                                if this_num != temp_num:
-                                    sum_list.append(this_num)
-                                    temp_num = this_num
+                                temp_num = retrieve_num(next_line_index, next_line, sum_list, temp_num)
 
             ## Check if numbers on current_line are adj to symbols on previous_line or next_line:
             for cur_line_index, num in enumerate(current_line):
@@ -114,17 +108,11 @@ def get_sum(arch: str):
                             current_line[cur_line_index-1] in symbols or
                             next_line[cur_line_index-1] in symbols
                             ):
-                            this_num = get_num(cur_line_index, current_line)
-                            if this_num != temp_num:
-                                sum_list.append(this_num)
-                                temp_num = this_num
+                            temp_num = retrieve_num(cur_line_index, current_line, sum_list, temp_num)
 
                     ## Same index - line above || line below:
                     if previous_line[cur_line_index] in symbols or next_line[cur_line_index] in symbols:
-                        this_num = get_num(cur_line_index, current_line)
-                        if this_num != temp_num:
-                            sum_list.append(this_num)
-                            temp_num = this_num
+                        temp_num = retrieve_num(cur_line_index, current_line, sum_list, temp_num)
 
                     ## Rigth - line above; same line; line below:
                     if cur_line_index+1 < len(current_line):
@@ -134,10 +122,7 @@ def get_sum(arch: str):
                             current_line[cur_line_index+1] in symbols or
                             next_line[cur_line_index+1] in symbols
                             ):
-                            this_num = get_num(cur_line_index, current_line)
-                            if this_num != temp_num:
-                                sum_list.append(this_num)
-                                temp_num = this_num
+                            temp_num = retrieve_num(cur_line_index, current_line, sum_list, temp_num)
 
     return sum(sum_list)
 
