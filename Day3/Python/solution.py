@@ -76,8 +76,6 @@ def get_sum(arch: str):
                 ## Check if numbers on previous_line are adj to symbols on current_line:
                 for prev_line_index, num in enumerate(previous_line):
                     if num.isnumeric():
-                        ## I'm not sure if this is better or worse than sepparating the `ìf`s.
-                        ## Leaving the second option as comments just so i remember
                         if (
                             ## Left - same line; line below:
                             prev_line_index-1 >= 0 and
@@ -207,7 +205,7 @@ def get_gears(arch: str):
                                 if current_line[prev_line_index+1].isnumeric():
                                     temp_num = retrieve_num(prev_line_index+1, current_line, first_line_nums, first_line_indexes, temp_num, index+1)
 
-                        ## If there's exactly 2 numbers adjacent to '*':
+                        ## If there are exactly 2 numbers adjacent to '*':
                         if len(first_line_nums) == 2:
                             master_list.append(first_line_nums[0]*first_line_nums[1])
 
@@ -241,7 +239,7 @@ def get_gears(arch: str):
                                 if current_line[next_line_index+1].isnumeric():
                                     temp_num = retrieve_num(next_line_index+1, current_line, last_line_nums, last_line_indexes, temp_num, index-1)
 
-                        ## If there's exactly 2 numbers adjacent to '*':
+                        ## If there are exactly 2 numbers adjacent to '*':
                         if len(last_line_nums) == 2:
                             master_list.append(last_line_nums[0]*last_line_nums[1])
 
