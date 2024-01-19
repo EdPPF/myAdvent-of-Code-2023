@@ -1,12 +1,13 @@
 fn main() {
     println!("Test: {}", get_sum("src/test.txt"));
-    assert_eq!(get_sum("src/test.txt"), 4361i32);
     println!("Input: {}", get_sum("src/schematic.txt"));
-    assert_eq!(get_sum("src/schematic.txt"), 539590i32);
+
+    println!("Test: {}", get_gears("src/test.txt"));
+    println!("Input: {}", get_gears("src/schematic.txt"));
 }
 
 
-use std::fs;
+use std::{fs, vec};
 fn file_parser(file: &str) -> String {
     let data: String = fs::read_to_string(file).expect("Unable to read file.");
     data
@@ -14,8 +15,9 @@ fn file_parser(file: &str) -> String {
 
 
 /// Getting number at specified index: Working
-fn get_number(initial_index: usize, line: &str) -> i32 {
-    let mut the_number: String = String::from("");
+fn get_number(initial_index: usize, line: &str) -> (i32, Vec<i32>) {
+    let mut the_number  : String   = String::from("");
+    let mut indexes_list: Vec<i32> = vec![];
 
     let mut temp_index: i32    = initial_index as i32;
     let mut temp_size: usize   = initial_index;
@@ -33,6 +35,7 @@ fn get_number(initial_index: usize, line: &str) -> i32 {
 
     // Now, walk right until reaching a non-number or end of line while composing the number
     while temp_num.is_numeric() {
+        indexes_list.push(temp_index);
         the_number += &temp_num.to_string();
         temp_index += 1;
         temp_size = temp_index as usize;
@@ -43,17 +46,25 @@ fn get_number(initial_index: usize, line: &str) -> i32 {
             break;
         }
     }
-    the_number.parse::<i32>().unwrap()
+    (the_number.parse::<i32>().unwrap(), indexes_list)
 }
 
 
 fn retrieve_number(
-    line_index: usize, target_line: &str, target_list: &mut Vec<i32>, mut temp_num: i32
+    line_index         : usize,
+    target_line        : &str,
+    target_numbers_list: &mut Vec<i32>,
+    target_indexes_list: &mut Vec<(Vec<i32>, i32)>, // -> [([45, 46, 47], 23)]
+    mut temp_num       : i32,
+    line_position      : i32
 ) -> i32 {
-    let this_num: i32 = get_number(line_index, target_line);
-    if this_num != temp_num {
-        target_list.push(this_num);
-        temp_num = this_num;
+    let (this_num, indexes) = get_number(line_index, target_line);
+    if !target_indexes_list.contains(&(indexes.clone(), line_position)) { // Why clone? Rust's compiler told me - it's because, without clone, indexes would be borrowed and dropped here, so i wouldn't be able to use it later.
+        target_indexes_list.push((indexes, line_position));
+        if this_num != temp_num {
+            target_numbers_list.push(this_num);
+            temp_num = this_num;
+        }
     }
     temp_num
 }
@@ -91,8 +102,6 @@ fn get_sum(file: &str) -> i32 {
                 // Check if numbers on previous_line are adj to symbols on current_line:
                 for (prev_line_index, line_char) in previous_line.char_indices() {
                     if line_char.is_numeric() {
-                        // I'm not sure if this is better or worse than sepparating the `ìf`s.
-                        // Leaving the second option as comments just so i remember
                         if (
                             // Left - same line; line below:
                             (prev_line_index as i32) - 1 >= 0 &&
@@ -114,33 +123,8 @@ fn get_sum(file: &str) -> i32 {
                             )
                         )
                         {
-                            temp_num = retrieve_number(prev_line_index, previous_line, &mut sum_list, temp_num);
+                            temp_num = retrieve_number(prev_line_index, previous_line, &mut sum_list,  &mut vec![(vec![1, 2], 3)], temp_num, index);
                         }
-
-                        // Left - same line; line below:
-                        // if ((prev_line_index as i32) - 1) >= 0 { // If ther's a char on the left
-                        //     // Same line || Line below, left diagonal:
-                        //     if symbols.contains(previous_line.chars().nth(prev_line_index-1).unwrap())
-                        //     || symbols.contains(current_line.chars().nth(prev_line_index-1).unwrap())
-                        //     {
-                        //         temp_num = retrieve_number(prev_line_index, previous_line, &mut sum_list, temp_num);
-                        //     }
-                        // }
-
-                        // Same index - line below:
-                        // if symbols.contains(current_line.chars().nth(prev_line_index).unwrap()) {
-                        //     temp_num = retrieve_number(prev_line_index, previous_line, &mut sum_list, temp_num);
-                        // }
-
-                        // Rigth - same line; line below:
-                        // if ((prev_line_index+1) as i32) < previous_line.len() as i32 {
-                        //     // Same line || Line below, right diagonal:
-                        //     if symbols.contains(previous_line.chars().nth(prev_line_index+1).unwrap())
-                        //     || symbols.contains(current_line.chars().nth(prev_line_index+1).unwrap())
-                        //     {
-                        //         temp_num = retrieve_number(prev_line_index, previous_line, &mut sum_list, temp_num);
-                        //     }
-                        // }
                     }
                 }
             }
@@ -170,33 +154,8 @@ fn get_sum(file: &str) -> i32 {
                             )
                         )
                         {
-                            temp_num = retrieve_number(next_line_index, next_line, &mut sum_list, temp_num);
+                            temp_num = retrieve_number(next_line_index, next_line, &mut sum_list, &mut vec![(vec![1, 2], 3)], temp_num, index);
                         }
-
-                        // Left - same line; line below:
-                        // if ((next_line_index as i32) - 1) >= 0 {
-                            // Same line || Line above, left diagonal:
-                        //     if symbols.contains(next_line.chars().nth(next_line_index-1).unwrap())
-                        //     || symbols.contains(current_line.chars().nth(next_line_index-1).unwrap())
-                        //     {
-                        //         temp_num = retrieve_number(next_line_index, next_line, &mut sum_list, temp_num);
-                        //     }
-                        // }
-
-                        // Same index - line above:
-                        // if symbols.contains(current_line.chars().nth(next_line_index).unwrap()) {
-                        //     temp_num = retrieve_number(next_line_index, next_line, &mut sum_list, temp_num);
-                        // }
-
-                        // Right - same line; line above:
-                        // if ((next_line_index as i32) + 1) < previous_line.len() as i32 {
-                        //     // Same line || Line above, right diagonal:
-                        //     if symbols.contains(next_line.chars().nth(next_line_index+1).unwrap())
-                        //     || symbols.contains(current_line.chars().nth(next_line_index+1).unwrap())
-                        //     {
-                        //         temp_num = retrieve_number(next_line_index, next_line, &mut sum_list, temp_num);
-                        //     }
-                        // }
                     }
                 }
             }
@@ -228,37 +187,8 @@ fn get_sum(file: &str) -> i32 {
                         )
                     )
                     {
-                        temp_num = retrieve_number(cur_line_index, current_line, &mut sum_list, temp_num);
+                        temp_num = retrieve_number(cur_line_index, current_line, &mut sum_list, &mut vec![(vec![1, 2], 3)], temp_num, index);
                     }
-
-                    // Left - line above; same line; line below:
-                    // if ((cur_line_index as i32) - 1) >= 0 {
-                    //     // Line above, left diagonal || Same line || Line below, left diagonal:
-                    //     if symbols.contains(previous_line.chars().nth(cur_line_index-1).unwrap())
-                    //     || symbols.contains(current_line.chars().nth(cur_line_index-1).unwrap())
-                    //     || symbols.contains(next_line.chars().nth(cur_line_index-1).unwrap())
-                    //     {
-                    //         temp_num = retrieve_number(cur_line_index, current_line, &mut sum_list, temp_num);
-                    //     }
-                    // }
-
-                    // Same index - line above || line below:
-                    // if symbols.contains(previous_line.chars().nth(cur_line_index).unwrap())
-                    // || symbols.contains(next_line.chars().nth(cur_line_index).unwrap())
-                    // {
-                    //     temp_num = retrieve_number(cur_line_index, current_line, &mut sum_list, temp_num);
-                    // }
-
-                    // Rigth - line above; same line; line below:
-                    // if ((cur_line_index as i32) + 1) < current_line.len() as i32 {
-                    //     // Line above, rigth diagonal || Same line || Line below, right diagonal:
-                    //     if symbols.contains(previous_line.chars().nth(cur_line_index+1).unwrap())
-                    //     || symbols.contains(current_line.chars().nth(cur_line_index+1).unwrap())
-                    //     || symbols.contains(next_line.chars().nth(cur_line_index+1).unwrap())
-                    //     {
-                    //         temp_num = retrieve_number(cur_line_index, current_line, &mut sum_list, temp_num);
-                    //     }
-                    // }
                 }
             }
         }
@@ -272,16 +202,339 @@ fn get_sum(file: &str) -> i32 {
 }
 
 
+////////////////////////////Part 2////////////////////////////
+
+fn get_gears(file: &str) -> i32 {
+    let data: String   = file_parser(file);
+    let lines: Vec<_>  = data.lines().collect();
+    let lines_len: i32 = lines.len() as i32;
+
+    let mut master_list: Vec<i32> = Vec::<i32>::with_capacity(500);
+
+    for (index_size, line) in lines.iter().enumerate() { // &&str ??????????
+        let index: i32 = match index_size.try_into() {
+            Ok(value) => value,
+            Err(_) => {
+                println!("ON LINE LOOP ->\n    Error converting `usize` to `i32`.\nJUMPING TO NEXT LINE");
+                continue;
+            }
+        };
+        let mut temp_num: i32  = 0;
+
+        if (index+1) < lines_len && (index-1) >= 0 {
+            // Getting lines: Working
+            let left_size:     usize = (index - 1) as usize;
+            let previous_line: &str  = lines[left_size];
+
+            let current_line:  &str  = *line;
+
+            let right_size:    usize = (index + 1) as usize;
+            let next_line:     &str  = lines[right_size];
+
+            // If previous_line is the first line of the input:
+            if (index-1) == 0 {
+                if previous_line.contains('*') {
+                    // Check if * on previous_line are adj to 2 numbers on current_line:
+                    for (prev_line_index, gear) in previous_line.char_indices() {
+                        let mut first_line_nums   : Vec<i32>             = vec![];
+                        let mut first_line_indexes: Vec<(Vec<i32>, i32)> = vec![];
+
+                        if gear == '*' {
+                            // Left - same line; line below:
+                            if (prev_line_index as i32-1) >= 0 {
+                                // Same line:
+                                if previous_line.chars().nth(prev_line_index-1).unwrap().is_numeric() {
+                                    temp_num = retrieve_number(
+                                        prev_line_index-1,
+                                        previous_line,
+                                        &mut first_line_nums,
+                                        &mut first_line_indexes,
+                                        temp_num,
+                                        index
+                                    );
+                                }
+                                // Line below, left diagonal:
+                                if current_line.chars().nth(prev_line_index-1).unwrap().is_numeric() {
+                                    temp_num = retrieve_number(
+                                        prev_line_index-1,
+                                        current_line,
+                                        &mut first_line_nums,
+                                        &mut first_line_indexes,
+                                        temp_num,
+                                        index+1
+                                    );
+                                }
+                            }
+
+                            // Same index - line below:
+                            if current_line.chars().nth(prev_line_index).unwrap().is_numeric() {
+                                temp_num = retrieve_number(
+                                    prev_line_index,
+                                    current_line,
+                                    &mut first_line_nums,
+                                    &mut first_line_indexes,
+                                    temp_num,
+                                    index+1
+                                );
+                            }
+
+                            // Rigth - same line; line below:
+                            if (prev_line_index - 1) < previous_line.len() {
+                                // Same line:
+                                if previous_line.chars().nth(prev_line_index+1).unwrap().is_numeric() {
+                                    temp_num = retrieve_number(
+                                        prev_line_index+1,
+                                        previous_line,
+                                        &mut first_line_nums,
+                                        &mut first_line_indexes,
+                                        temp_num,
+                                        index
+                                    );
+                                }
+                                // Line below, right diagonal:
+                                if current_line.chars().nth(prev_line_index+1).unwrap().is_numeric() {
+                                    temp_num = retrieve_number(
+                                        prev_line_index+1,
+                                        current_line,
+                                        &mut first_line_nums,
+                                        &mut first_line_indexes,
+                                        temp_num,
+                                        index+1
+                                    );
+                                }
+                            }
+                        }
+
+                        // If there are exactly 2 numbers adjacent to '*':
+                        if first_line_nums.len() == 2 {
+                            master_list.push(first_line_nums[0]*first_line_nums[1])
+                        }
+                    }
+                }
+            }
+
+            // If next line is the last of the input:
+            if (index+2) == lines_len {
+                if next_line.contains('*') {
+                    // Check if numbers on next_line are adj to symbols on current_line:
+                    for (next_line_index, gear) in next_line.char_indices() {
+                        let mut last_line_nums   : Vec<i32>             = vec![];
+                        let mut last_line_indexes: Vec<(Vec<i32>, i32)> = vec![];
+
+                        if gear == '*' {
+                            // Left - same line || line above:
+                            if (next_line_index as i32 - 1) >= 0 {
+                                // Same line:
+                                if next_line.chars().nth(next_line_index-1).unwrap().is_numeric() {
+                                    temp_num = retrieve_number(
+                                        next_line_index-1,
+                                        next_line,
+                                        &mut last_line_nums,
+                                        &mut last_line_indexes,
+                                        temp_num,
+                                        index
+                                    );
+                                }
+                                // Line above, left diagonal:
+                                if next_line.chars().nth(next_line_index-1).unwrap().is_numeric() {
+                                    temp_num = retrieve_number(
+                                        next_line_index-1,
+                                        current_line,
+                                        &mut last_line_nums,
+                                        &mut last_line_indexes,
+                                        temp_num,
+                                        index-1
+                                    );
+                                }
+                            }
+
+                            // Same index - line above:
+                            if current_line.chars().nth(next_line_index).unwrap().is_numeric() {
+                                temp_num = retrieve_number(
+                                    next_line_index,
+                                    current_line,
+                                    &mut last_line_nums,
+                                    &mut last_line_indexes,
+                                    temp_num,
+                                    index-1
+                                );
+                            }
+
+                            // Rigth - same line || line above:
+                            if (next_line_index + 1) < previous_line.len() {
+                                // Same line:
+                                if next_line.chars().nth(next_line_index+1).unwrap().is_numeric() {
+                                    temp_num = retrieve_number(
+                                        next_line_index+1,
+                                        next_line,
+                                        &mut last_line_nums,
+                                        &mut last_line_indexes,
+                                        temp_num,
+                                        index
+                                    );
+                                }
+                                // Line above, right diagonal:
+                                if current_line.chars().nth(next_line_index+1).unwrap().is_numeric() {
+                                    temp_num = retrieve_number(
+                                        next_line_index+1,
+                                        current_line,
+                                        &mut last_line_nums,
+                                        &mut last_line_indexes,
+                                        temp_num,
+                                        index-1
+                                    );
+                                }
+                            }
+                        }
+
+                        // If there are exactly 2 numbers adjacent to '*':
+                        if last_line_nums.len() == 2 {
+                            master_list.push(last_line_nums[0]*last_line_nums[1]);
+                        }
+                    }
+                }
+            }
+
+            if current_line.contains('*') {
+                // Check if numbers on current_line are adj to symbols on previous_line or next_line:
+                for (cur_line_index, gear) in current_line.char_indices() {
+                    let mut cur_line_nums   : Vec<i32>             = vec![];
+                    let mut cur_line_indexes: Vec<(Vec<i32>, i32)> = vec![];
+
+                    if gear == '*' {
+                        // Left - line above; same line; line below:
+                        if (cur_line_index as i32 - 1) >= 0 {
+                            // Line above, left diagonal:
+                            if previous_line.chars().nth(cur_line_index-1).unwrap().is_numeric() {
+                                temp_num = retrieve_number(
+                                    cur_line_index-1,
+                                    previous_line,
+                                    &mut cur_line_nums,
+                                    &mut cur_line_indexes,
+                                    temp_num,
+                                    index-1
+                                );
+                            }
+                            // Same line
+                            if current_line.chars().nth(cur_line_index-1).unwrap().is_numeric() {
+                                temp_num = retrieve_number(
+                                    cur_line_index-1,
+                                    current_line,
+                                    &mut cur_line_nums,
+                                    &mut cur_line_indexes,
+                                    temp_num,
+                                    index
+                                );
+                            }
+                            // Line below, left diagonal:
+                            if next_line.chars().nth(cur_line_index-1).unwrap().is_numeric() {
+                                temp_num = retrieve_number(
+                                    cur_line_index-1,
+                                    next_line,
+                                    &mut cur_line_nums,
+                                    &mut cur_line_indexes,
+                                    temp_num,
+                                    index+1
+                                );
+                            }
+                        }
+
+                        // Same index - line above:
+                        if previous_line.chars().nth(cur_line_index).unwrap().is_numeric() {
+                            temp_num = retrieve_number(
+                                cur_line_index,
+                                previous_line,
+                                &mut cur_line_nums,
+                                &mut cur_line_indexes,
+                                temp_num,
+                                index-1
+                            );
+                        }
+                        // Same index - line below:
+                        if next_line.chars().nth(cur_line_index).unwrap().is_numeric() {
+                            temp_num = retrieve_number(
+                                cur_line_index,
+                                next_line,
+                                &mut cur_line_nums,
+                                &mut cur_line_indexes,
+                                temp_num,
+                                index+1
+                            );
+                        }
+
+                        // Rigth - line above; same line; line below:
+                        if (cur_line_index + 1) < current_line.len() {
+                            // Line above, rigth diagonal:
+                            if previous_line.chars().nth(cur_line_index+1).unwrap().is_numeric() {
+                                temp_num = retrieve_number(
+                                    cur_line_index+1,
+                                    previous_line,
+                                    &mut cur_line_nums,
+                                    &mut cur_line_indexes,
+                                    temp_num,
+                                    index-1
+                                );
+                            }
+                            // Same line:
+                            if current_line.chars().nth(cur_line_index+1).unwrap().is_numeric() {
+                                temp_num = retrieve_number(
+                                    cur_line_index+1,
+                                    current_line,
+                                    &mut cur_line_nums,
+                                    &mut cur_line_indexes,
+                                    temp_num,
+                                    index
+                                );
+                            }
+                            // Line below, right diagonal:
+                            if next_line.chars().nth(cur_line_index+1).unwrap().is_numeric() {
+                                temp_num = retrieve_number(
+                                    cur_line_index+1,
+                                    next_line,
+                                    &mut cur_line_nums,
+                                    &mut cur_line_indexes,
+                                    temp_num,
+                                    index+1
+                                );
+                            }
+                        }
+                    }
+
+                    // If there's exactly 2 numbers adjacent to '*':
+                    if cur_line_nums.len() == 2 {
+                        master_list.push(cur_line_nums[0]*cur_line_nums[1]);
+                    }
+                }
+            }
+        }
+    }
+
+    let mut sum: i32 = 0;
+    for number in master_list.iter() {
+        sum += number;
+    }
+    sum
+}
+
 
 ////////// Unit Tests //////////
 #[cfg(test)]
 mod unit_tests {
     #[test]
-    fn get_gears_from_test() {
+    fn get_sum_from_test() {
         assert_eq!(super::get_sum("src/test.txt"), 4361i32);
     }
     #[test]
-    fn get_gears_from_schematic() {
+    fn get_sum_from_schematic() {
         assert_eq!(super::get_sum("src/schematic.txt"), 539590i32);
+    }
+
+    #[test]
+    fn get_gears_from_test() {
+        assert_eq!(super::get_gears("src/test.txt"), 467835i32);
+    }
+    #[test]
+    fn get_gears_from_schematic() {
+        assert_eq!(super::get_gears("src/schematic.txt"), 80703636i32);
     }
 }
