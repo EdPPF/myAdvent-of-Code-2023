@@ -22,10 +22,6 @@ def get_points(path:str) -> int:
         for number in obtained_numbers:
             if number in winning_numbers:
                 points = points+1 if points == 0 else points*2
-                # if points == 0:
-                #     points += 1
-                # else:
-                #     points *= 2
         total += points
 
     return total
