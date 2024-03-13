@@ -1,8 +1,8 @@
 def main():
     # print(get_points("test.txt", False))
     # print(get_points("input.txt", False))
-    # print(second_impact("test.txt"))
-    print(second_impact("input.txt"))
+    print(second_impact("Python/input.txt"))
+    # print(second_impact("Python/input.txt"))
 
 
 ## I'm resorting to regex... For no particular reason though.
@@ -34,51 +34,63 @@ def get_points(path:str, part_two: bool) -> int | dict[int, list[int]]:
 
 
 #############################Part 2##############################
-def get_sub_dicts(og_dict: dict[int, list[int]], cur_key: int) -> dict[int, list[int]]:
-    returning_dict: dict[int, list[int]] = {}
-    size: int = len(og_dict[cur_key])
-    for i in range(cur_key+1, cur_key+size+1):
-        if i > len(og_dict):
-            break
-        returning_dict[i] = og_dict[i]
-    return returning_dict
+class ScratchCard:
+    def __init__(self, winning_nums: list[str], holding_nums: list[str], card_id: int) -> None:
+        self.winning_numbers: list[str] = winning_nums
+        self.holding_numbers: list[str] = holding_nums
+        self.occurrences    : int  = 1
+        self.id        : int  = card_id
 
-def compose_sub_dicts(cur_dict: dict[int, list[int]], og_dict: dict[int, list[int]]) -> dict[int, list[int]]:
-    for key in cur_dict.keys():
-        sub_dict = get_sub_dicts(og_dict, key)
-        yield sub_dict
+    def add_occurrence(self) -> None:
+        self.occurrences += 1
 
-import pprint
-pp = pprint.PrettyPrinter(indent=4)
-def second_impact(path:str) -> int:
-    cards_dict : dict[int, list[int]]       = get_points(path, True)
-    og_list    : list[dict[int, list[int]]] = [cards_dict]
-    master_list: list[dict[int, list[int]]] = []
+    def get_matches(self) -> int:
+        """
+        Returns the number of itens that appear both on `self.winning_numbers` and
+        `self.holding_numbers`.
+        """
+        counter = 0
+        for num in self.holding_numbers:
+            if num in self.winning_numbers:
+                counter += 1
+        return counter
 
-    cur_list = og_list
-    while cur_list != [{}]:
-        temp_list = []
-        for dictio in cur_list:
-            gen = compose_sub_dicts(dictio, cards_dict)
-            sub_list = []
-            while True:
-                try:
-                    sub_list.append(next(gen))
-                except StopIteration:
-                    break
-            master_list += sub_list
-            temp_list += sub_list
-        cur_list = temp_list
-        pp.pprint(cur_list)
-        break
 
-    # sum_points = 0
-    # for dictio in master_list:
-    #     sum_points += len(dictio)
-    # for ogicts in og_list:
-    #     sum_points += len(ogicts)
-    sum_points = sum(len(dictio) for dictio in master_list + og_list)
-    return sum_points
+def second_impact(path: str) -> int:
+    with open(file=path) as arc:
+        archive = arc.read().split('\n')
+    archive = archive[:-1]
+
+    adict = {}
+    scratches = []
+    for card in archive:
+        separated_nums = card.split('|')
+
+        win_nums = re.findall(r'\d+', separated_nums[0])
+        card_id = int(win_nums[0])
+        win_nums = win_nums[1:]
+        hold_nums = re.findall(r'\d+', separated_nums[1])
+
+        card = ScratchCard(win_nums, hold_nums, card_id)
+        adict[card] = card.get_matches()
+        scratches.append(card)
+
+    keys = list(adict.keys())
+    for i in range(len(keys)):
+        current_card = keys[i]
+        current_times = adict[current_card]
+        if current_times == 0:
+            continue
+        for _ in range(current_card.occurrences):
+            for j in range(current_card.id, current_card.id + current_times):
+                next_card = keys[j]
+                next_card.add_occurrence()
+
+    total = 0
+    for card in adict:
+        total += card.occurrences
+
+    return total
 
 
 if __name__ == "__main__":
