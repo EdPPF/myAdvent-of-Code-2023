@@ -1,7 +1,7 @@
 def main():
     # print(get_points("test.txt", False))
     # print(get_points("input.txt", False))
-    print(second_impact("Python/input.txt"))
+    print(second_impact("./input.txt"))
     # print(second_impact("Python/input.txt"))
 
 
@@ -41,8 +41,8 @@ class ScratchCard:
         self.occurrences    : int  = 1
         self.id        : int  = card_id
 
-    def add_occurrence(self) -> None:
-        self.occurrences += 1
+    def add_occurrence(self, times) -> None:
+        self.occurrences += times
 
     def get_matches(self) -> int:
         """
@@ -81,10 +81,10 @@ def second_impact(path: str) -> int:
         current_times = adict[current_card]
         if current_times == 0:
             continue
-        for _ in range(current_card.occurrences):
-            for j in range(current_card.id, current_card.id + current_times):
-                next_card = keys[j]
-                next_card.add_occurrence()
+
+        for j in range(current_card.id, current_card.id + current_times):
+            next_card = keys[j]
+            next_card.add_occurrence(current_card.occurrences)
 
     total = 0
     for card in adict:
