@@ -1,7 +1,7 @@
 def main():
     # print(get_points("test.txt", False))
     # print(get_points("input.txt", False))
-    print(second_impact("./input.txt"))
+    print(second_impact("../input.txt"))
     # print(second_impact("Python/input.txt"))
 
 
