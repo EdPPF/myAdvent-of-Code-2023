@@ -17,6 +17,3 @@ class TestFirstImpact(unittest.TestCase):
             times.append(elapsed_time)
         average = sum(times)/3.0
         print(f"RESULT = {result} - Average time: {average:.3f} seconds")
-
-if __name__ == "__main__":
-    unittest.main()
