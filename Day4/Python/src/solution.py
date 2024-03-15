@@ -1,6 +1,6 @@
 def main():
-    print(get_points("test.txt"))
-    print(get_points("input.txt"))
+    print(first_impact("test.txt"))
+    print(first_impact("input.txt"))
     # print(second_impact("../input.txt"))
     # print(second_impact("../input.txt"))
 
@@ -10,7 +10,7 @@ class ScratchCard:
         self.winning_numbers: list[str] = winning_nums
         self.holding_numbers: list[str] = holding_nums
         self.occurrences    : int  = 1
-        self.id        : int  = card_id
+        self.id             : int  = card_id
 
     def add_occurrence(self, times) -> None:
         self.occurrences += times
@@ -38,7 +38,7 @@ class ScratchCard:
         return points
 
 
-def open_file(path: str) -> list[str]:
+def _open_file(path: str) -> list[str]:
     """
     Auxiliar function for opening input files.\n
     Returns:
@@ -49,7 +49,7 @@ def open_file(path: str) -> list[str]:
     return archive[:-1]
 
 
-def get_card_components(line: str) -> tuple[list[int], list[int], int]:
+def _get_card_components(line: str) -> tuple[list[int], list[int], int]:
     """
     Auxiliar function\n
     Parses a line of input and extracts the card components.
@@ -71,13 +71,13 @@ def get_card_components(line: str) -> tuple[list[int], list[int], int]:
 
 import re
 #############################Part 1##############################
-def get_points(path:str) -> int:
-    archive = open_file(path)
+def first_impact(path:str) -> int:
+    archive = _open_file(path)
 
-    total: int = 0
+    total = 0
     for line in archive:
-        points: int = 0
-        winning_numbers, obtained_numbers, card_id = get_card_components(line)
+        points = 0
+        winning_numbers, obtained_numbers, card_id = _get_card_components(line)
 
         card = ScratchCard(winning_numbers, obtained_numbers, card_id)
 
@@ -88,12 +88,12 @@ def get_points(path:str) -> int:
 
 #############################Part 2##############################
 def second_impact(path: str) -> int:
-    archive = open_file(path)
+    archive = _open_file(path)
 
     cards_deck = {}
     scratches = []
     for line in archive:
-        win_nums, hold_nums, card_id = get_card_components(line)
+        win_nums, hold_nums, card_id = _get_card_components(line)
 
         card = ScratchCard(win_nums, hold_nums, card_id)
         cards_deck[card] = card.get_matches()

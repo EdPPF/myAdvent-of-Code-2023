@@ -1,4 +1,4 @@
 print('''
 ++++ AoC Day 4 ++++
-Running Tests Benchmark
+Running Tests and Benchmarks
 ''')
