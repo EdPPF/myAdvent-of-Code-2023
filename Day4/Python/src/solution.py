@@ -1,10 +1,3 @@
-def main():
-    print(first_impact("test.txt"))
-    print(first_impact("input.txt"))
-    # print(second_impact("../input.txt"))
-    # print(second_impact("../input.txt"))
-
-
 class ScratchCard:
     def __init__(self, winning_nums: list[str], holding_nums: list[str], card_id: int) -> None:
         self.winning_numbers: list[str] = winning_nums
@@ -115,7 +108,3 @@ def second_impact(path: str) -> int:
         total += card.occurrences
 
     return total
-
-
-if __name__ == "__main__":
-    main()
